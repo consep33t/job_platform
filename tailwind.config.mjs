@@ -1,5 +1,7 @@
 /** @type {import('tailwindcss').Config} */
-export default {
+const daisyui = require("daisyui");
+
+module.exports = {
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -8,10 +10,13 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+        "-primary": "#fcfcfc",
+        "-secondary": "#212D2E",
+        "-tertiary": "#2D4F64",
+        "-quaternary": "#A28D51",
+        "-background": "#E8E8E8",
       },
     },
   },
-  plugins: [],
+  plugins: [daisyui],
 };
