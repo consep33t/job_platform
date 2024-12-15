@@ -2,38 +2,6 @@ import promisePool from "../../../../lib/db";
 import fs from "fs-extra";
 import path from "path";
 
-export async function GET(req) {
-  try {
-    const { searchParams } = new URL(req.url);
-    const creator_id = searchParams.get("creator_id");
-
-    let query = "SELECT * FROM job";
-    const params = [];
-
-    if (creator_id) {
-      query += " WHERE creator_id = ?";
-      params.push(creator_id);
-    }
-
-    query += " ORDER BY created_at DESC";
-
-    const [rows] = await promisePool.execute(query, params);
-
-    return new Response(JSON.stringify(rows), {
-      status: 200,
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-  } catch (error) {
-    console.error("Database Error [GET]:", error.message);
-    return new Response(
-      JSON.stringify({ error: "Failed to fetch jobs", details: error.message }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
-    );
-  }
-}
-
 export async function POST(req) {
   try {
     const formData = await req.formData();
@@ -63,12 +31,15 @@ export async function POST(req) {
     const uploadsDir = path.resolve("./public/uploads");
     await fs.ensureDir(uploadsDir);
 
+    // Create a unique file name to avoid conflict
     const fileName = `${Date.now()}-${file.name}`;
     const filePath = path.join(uploadsDir, fileName);
 
+    // Save file to uploads directory
     const fileBuffer = await file.arrayBuffer();
     await fs.writeFile(filePath, Buffer.from(fileBuffer));
 
+    // Insert job data into database with the relative path for image
     const [result] = await promisePool.execute(
       `INSERT INTO job (nama_pekerjaan, keterangan, kategori_pekerjaan, lama_waktu, url_gambar, creator_id) 
        VALUES (?, ?, ?, ?, ?, ?)`,
