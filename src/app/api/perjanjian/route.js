@@ -15,10 +15,10 @@ export async function GET(req) {
         u1.nama AS nama_pembuat, 
         u2.nama AS nama_pelamar, 
         p.status
-      FROM PERJANJIAN p
-      JOIN JOB j ON p.job_id = j.job_id
-      JOIN USER u1 ON p.pembuat_id = u1.user_id
-      JOIN USER u2 ON p.pelamar_id = u2.user_id
+      FROM perjanjian p
+      JOIN job j ON p.job_id = j.job_id
+      JOIN user u1 ON p.pembuat_id = u1.user_id
+      JOIN user u2 ON p.pelamar_id = u2.user_id
     `;
 
     // Menambah kondisi filter secara dinamis

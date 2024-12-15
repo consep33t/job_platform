@@ -38,7 +38,7 @@ export async function POST(req) {
       );
     }
 
-    const query = `INSERT INTO PERJANJIAN (job_id, pembuat_id, pelamar_id, status, created_at) VALUES (?, ?, ?, ?, NOW())`;
+    const query = `INSERT INTO perjanjian (job_id, pembuat_id, pelamar_id, status, created_at) VALUES (?, ?, ?, ?, NOW())`;
     const values = [jobId, creatorId, pelamarId, "Pending"];
 
     await promisePool.query(query, values);
