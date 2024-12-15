@@ -1,29 +1,28 @@
-/** @type {import('next').NextConfig} */
+import livereload from "livereload"; // Import livereload
+import connectLivereload from "connect-livereload"; // Import connect-livereload
+
+// Check for 'NODE_ENV' to run livereload only in development
+if (process.env.NODE_ENV === "development") {
+  // Membuat livereload server
+  const liveReloadServer = livereload.createServer({
+    exts: ["js", "css", "html", "png", "jpg", "jpeg", "gif", "svg", "webp"], // Ekstensi file yang dipantau
+    port: 35729, // Port livereload
+  });
+
+  // Menonton folder publik untuk perubahan
+  liveReloadServer.watch(process.cwd() + "/public/uploads");
+}
+
 const nextConfig = {
   eslint: {
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: true, // Abaikan ESLint selama build
   },
   images: {
-    domains: ["img.daisyui.com", "example.com", "localhost", "147.93.18.133"],
+    domains: ["img.daisyui.com", "example.com"], // Tambahkan domain gambar
   },
-};
-
-// Tambahkan middleware LiveReload
-const livereload = require("livereload");
-const connectLivereload = require("connect-livereload");
-
-const liveReloadServer = livereload.createServer({
-  exts: ["js", "css", "html", "png", "jpg", "jpeg", "gif", "svg"],
-  debug: true,
-});
-
-// Pantau folder yang perlu diawasi, misalnya `public/uploads`
-liveReloadServer.watch(process.cwd() + "/public/uploads");
-
-module.exports = {
-  ...nextConfig,
   webpackDevMiddleware: (config) => {
-    config.server = connectLivereload();
     return config;
   },
 };
+
+export default nextConfig;
