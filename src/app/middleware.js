@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 
-const SECRET_KEY = "sangatrahasia123321";
-
 export function middleware(req) {
   const token = req.cookies.get("token");
 
@@ -11,7 +9,7 @@ export function middleware(req) {
   }
 
   try {
-    jwt.verify(token, SECRET_KEY);
+    jwt.verify(token, process.env.JWT_SECRET);
     return NextResponse.next();
   } catch (error) {
     return NextResponse.redirect("/login");
