@@ -7,7 +7,7 @@ export async function GET(req) {
     const { searchParams } = new URL(req.url);
     const creator_id = searchParams.get("creator_id");
 
-    let query = "SELECT * FROM JOB";
+    let query = "SELECT * FROM job";
     const params = [];
 
     if (creator_id) {
