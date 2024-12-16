@@ -25,7 +25,11 @@ const NavBar = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (token) {
+
+    if (!token) {
+      setIsLoading(false);
+      return;
+    } else if (token) {
       const decodedUser = jwtDecode(token);
       setUser(decodedUser);
       setIsLoading(false);

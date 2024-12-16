@@ -12,7 +12,7 @@ export async function POST(req) {
 
     if (!email || !password) {
       return NextResponse.json(
-        { error: "Email dan password wajib diisi!" },
+        { message: "Email dan password wajib diisi!" },
         { status: 400 }
       );
     }
@@ -24,7 +24,7 @@ export async function POST(req) {
 
     if (users.length === 0) {
       return NextResponse.json(
-        { error: "Email atau password salah" },
+        { message: "Email atau password salah" },
         { status: 401 }
       );
     }
@@ -34,7 +34,7 @@ export async function POST(req) {
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       return NextResponse.json(
-        { error: "Email atau password salah" },
+        { message: "Email atau password salah" },
         { status: 401 }
       );
     }
@@ -50,11 +50,15 @@ export async function POST(req) {
         skils: user.skils,
       },
       SECRET_KEY,
-      { expiresIn: "24h" }
+      { expiresIn: "1h" }
     );
 
     return NextResponse.json(
-      { message: "Login berhasil!", token },
+      {
+        message:
+          "Selamat Datan Di Lastron Di Mana Kamu Bisa Menemukan Pekerjaan Sesuai Keinginan Kamu!",
+        token,
+      },
       { status: 200 }
     );
   } catch (error) {

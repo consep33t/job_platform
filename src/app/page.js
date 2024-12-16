@@ -70,9 +70,8 @@ const Home = () => {
     <div className="mb-40">
       <Hero
         title="Hello, Freelancer"
-        subtitle="Temukan berbagai macam pekerjaan yang sesuia dengan minat dan
-            kemampuan anda, Kami hadir untuk mempermudah anda dalam mecari
-            pekerjaan paruh waktu berbasis jasa, ..!!"
+        subtitle="Temukan pekerjaan yang sesuai dengan minat dan keahlian Anda!
+Kami hadir untuk membantu Anda menemukan peluang pekerjaan paruh waktu berbasis jasa dengan lebih mudah. Jadilah bagian dari komunitas yang menghubungkan pencari kerja dengan kebutuhan layanan di berbagai bidang. Temukan fleksibilitas, peluang, dan pengalaman baru di sini!"
         type="beranda"
       />
       <div className="mt-[10vh] w-full flex justify-between gap-10">

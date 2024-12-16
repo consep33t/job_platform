@@ -11,10 +11,10 @@ const Hero = ({ title, subtitle, type }) => {
       }}
     >
       <div className="hero-overlay bg-opacity-60 rounded-3xl w-full"></div>
-      <div className="hero-content text-neutral-content text-center w-full">
+      <div className="hero-content text-neutral-content w-full">
         <div className="-text-background w-full">
-          <h1 className="mb-5 text-5xl font-bold w-full">{title}</h1>
-          <p className="mb-5">{subtitle}</p>
+          <h1 className="mb-10 text-5xl font-bold w-full uppercase">{title}</h1>
+          <p className="mb-10 text-2xl capitalize">{subtitle}</p>
           {type === "beranda" ? (
             <Link
               href="#job"

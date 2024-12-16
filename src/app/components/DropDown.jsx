@@ -89,30 +89,46 @@ const DropDown = () => {
           />
           <textarea
             name="keterangan"
+            maxLength={250}
             value={formData.keterangan}
             onChange={handleChange}
-            placeholder="Deskripsi Pekerjaan"
+            placeholder="Deskripsi Pekerjaan max-200-karakter"
             className="textarea textarea-bordered -bg-background w-full"
             required
           />
-          <input
-            type="text"
+          <select
             name="kategori_pekerjaan"
             value={formData.kategori_pekerjaan}
             onChange={handleChange}
-            placeholder="Kategori Pekerjaan Teknologi, Design, Pemasaran, Manajemen, Keuangan"
             className="input input-bordered -bg-background w-full"
             required
-          />
-          <input
-            type="text"
+          >
+            <option value="" disabled>
+              Pilih Kategori Pekerjaan
+            </option>
+            <option value="Teknologi">Teknologi</option>
+            <option value="Design">Design</option>
+            <option value="Pemasaran">Pemasaran</option>
+            <option value="Manajemen">Manajemen</option>
+            <option value="Keuangan">Keuangan</option>
+          </select>
+          <select
             name="lama_waktu"
             value={formData.lama_waktu}
             onChange={handleChange}
-            placeholder="Lama Waktu 5 Hari, 10 Hari, 15 Hari, 20 Hari, 25 Hari, 30 Hari"
             className="input input-bordered -bg-background w-full"
             required
-          />
+          >
+            <option value="" disabled>
+              Pilih Lama Waktu
+            </option>
+            <option value={5}>5 Hari</option>
+            <option value={10}>10 Hari</option>
+            <option value={15}>15 Hari</option>
+            <option value={20}>20 Hari</option>
+            <option value={25}>25 Hari</option>
+            <option value={30}>30 Hari</option>
+          </select>
           <input
             type="file"
             name="url_gambar"

@@ -37,8 +37,8 @@ const AboutPage = () => {
   return (
     <div className="flex flex-col w-full">
       <Hero
-        title="Selamat datang di Lastron, platform terpercaya untuk menghubungkan penyedia jasa dengan pencari layanan di seluruh Indonesia!"
-        subtitle="Di Lastron, kami percaya bahwa setiap keahlian memiliki nilai dan setiap kebutuhan memiliki solusi. Kami hadir untuk memudahkan Anda dalam mencari pekerjaan berbasis jasa atau memposting pekerjaan yang membutuhkan keahlian khusus. Dengan antarmuka yang ramah pengguna dan sistem yang transparan, kami menjembatani kesenjangan antara pelaku jasa dan pelanggan."
+        title="Selamat datang di Lastron,"
+        subtitle="platform terpercaya untuk menghubungkan penyedia jasa dengan pencari layanan di seluruh Indonesia! Di Lastron, kami percaya bahwa setiap keahlian memiliki nilai dan setiap kebutuhan memiliki solusi. Kami hadir untuk memudahkan Anda dalam mencari pekerjaan berbasis jasa atau memposting pekerjaan yang membutuhkan keahlian khusus. Dengan antarmuka yang ramah pengguna dan sistem yang transparan, kami menjembatani kesenjangan antara pelaku jasa dan pelanggan."
         type="about"
       />
 
