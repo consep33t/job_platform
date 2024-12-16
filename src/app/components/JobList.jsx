@@ -55,7 +55,7 @@ const JobList = ({ jobs }) => {
               <Image
                 width={400}
                 height={400}
-                src={job.url_gambar}
+                src={`/api/files/${job.url_gambar}`}
                 alt={job.nama_pekerjaan}
                 className="w-full h-full object-cover"
               />

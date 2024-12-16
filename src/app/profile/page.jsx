@@ -22,8 +22,6 @@ const ProfilePage = () => {
     setSelectedJobId(selectedJobId === jobId ? null : jobId);
   };
 
-  console.log(selectedJobId);
-
   const updateStatus = async (perjanjianId, status) => {
     try {
       const response = await fetch("/api/jobPerjanjian/update", {
@@ -119,9 +117,7 @@ const ProfilePage = () => {
         <Image
           width={400}
           height={400}
-          src={
-            users.background_profile || "https://placeimg.com/192/192/nature"
-          }
+          src={users.background_profile}
           className="w-full h-[50vh] rounded-xl object-cover"
           alt="Profile Cover"
         />

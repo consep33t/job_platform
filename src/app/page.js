@@ -128,9 +128,7 @@ const Home = () => {
           <h2 className="text-4xl -text-tertiary">Pekerjanan Untuk Kamu</h2>
         </div>
         <div className="flex w-full gap-5 flex-wrap">
-          {recomendedJobs.map((job) => (
-            <RecommendedJobList key={job.job_id} jobs={job} />
-          ))}
+          <RecommendedJobList jobs={recomendedJobs} />
         </div>
       </div>
     </div>

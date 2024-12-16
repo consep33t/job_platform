@@ -2,6 +2,8 @@ import promisePool from "../../../../lib/db";
 import fs from "fs-extra";
 import path from "path";
 
+const uploadsDir = path.resolve("./uploads");
+
 export async function GET(req) {
   try {
     const { searchParams } = new URL(req.url);
@@ -60,15 +62,18 @@ export async function POST(req) {
       );
     }
 
-    const uploadsDir = path.resolve("./public/uploads");
+    // Pastikan folder "uploads" ada
     await fs.ensureDir(uploadsDir);
 
+    // Buat nama file unik
     const fileName = `${Date.now()}-${file.name}`;
     const filePath = path.join(uploadsDir, fileName);
 
+    // Simpan file di server
     const fileBuffer = await file.arrayBuffer();
     await fs.writeFile(filePath, Buffer.from(fileBuffer));
 
+    // Simpan data ke database
     const [result] = await promisePool.execute(
       `INSERT INTO job (nama_pekerjaan, keterangan, kategori_pekerjaan, lama_waktu, url_gambar, creator_id) 
        VALUES (?, ?, ?, ?, ?, ?)`,
@@ -77,7 +82,7 @@ export async function POST(req) {
         keterangan,
         kategori_pekerjaan,
         parseInt(lama_waktu),
-        `/uploads/${fileName}`,
+        fileName, // Simpan nama file (bukan URL) ke database
         creator_id,
       ]
     );

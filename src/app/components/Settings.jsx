@@ -8,6 +8,7 @@ const Settings = () => {
     nama: "",
     semboyan: "",
     pekerjaan: "",
+    phone: "",
     skils: "",
   });
   const [profileImage, setProfileImage] = useState(null);
@@ -41,7 +42,8 @@ const Settings = () => {
       data.append("nama", formData.nama);
       data.append("semboyan", formData.semboyan);
       data.append("pekerjaan", formData.pekerjaan);
-      data.append("skils", JSON.stringify(formData.skils.split(","))); // Convert skills string to array
+      data.append("phone", formData.phone);
+      data.append("skils", JSON.stringify(formData.skils.split(",")));
       data.append("user_id", decode.userId);
 
       if (profileImage) data.append("url_profile", profileImage);
@@ -57,6 +59,7 @@ const Settings = () => {
         setProfileImage(null);
         setBackgroundImage(null);
         setFormData((prev) => ({ ...prev, skils: "" }));
+        window.location.reload();
       } else {
         const errorData = await response.json();
         setMessage(`Gagal memperbarui profil: ${errorData.error}`);
@@ -96,6 +99,14 @@ const Settings = () => {
         value={formData.pekerjaan}
         onChange={handleChange}
         placeholder="Pekerjaan"
+        className="input input-bordered w-full -bg-background"
+      />
+      <input
+        type="phone"
+        name="phone"
+        value={formData.phone}
+        onChange={handleChange}
+        placeholder="Nomor Telepon"
         className="input input-bordered w-full -bg-background"
       />
       <input
