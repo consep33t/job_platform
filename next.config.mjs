@@ -4,7 +4,18 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   images: {
-    domains: ["img.daisyui.com", "example.com"],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "img.daisyui.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "example.com",
+        pathname: "/**",
+      },
+    ],
   },
 };
 
