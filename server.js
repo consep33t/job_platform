@@ -41,7 +41,7 @@ app.prepare().then(() => {
           `Message sent from ${sender_id} to ${receiver_id}: ${pesan}`
         );
 
-        // Emit to the receiver
+        // Emit ke penerima
         io.emit(`receive_message_${receiver_id}`, data);
       } catch (err) {
         console.error("Error inserting message:", err.message);

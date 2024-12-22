@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { jwtDecode } from "jwt-decode";
 import Image from "next/image";
+import ChatPage from "../chat/[creatorId]/page";
 
 const NavBar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -105,26 +106,17 @@ const NavBar = () => {
         </button>
         {/* Modal */}
         <dialog id="my_modal_3" className="modal w-full">
-          <div className="modal-box">
+          <div className="modal-box max-w-5xl modal-bottom">
             <button
               className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
               onClick={closeModal}
             >
               ✕
             </button>
-            <div className="w-16">
-              <button className="">
-                <div className="avatar">
-                  <div className="w-full rounded-full">
-                    <Image
-                      width={100}
-                      height={100}
-                      src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
-                      alt="avatar"
-                    />
-                  </div>
-                </div>
-              </button>
+            <div className="w-full">
+              <div className="w-full">
+                <ChatPage />
+              </div>
             </div>
           </div>
         </dialog>

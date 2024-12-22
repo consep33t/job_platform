@@ -1,7 +1,6 @@
-// src/app/api/chat-history/route.js
-
 import mysql from "mysql2/promise";
 
+// Gunakan pool untuk efisiensi koneksi
 const db = mysql.createPool({
   host: "localhost",
   user: "root",

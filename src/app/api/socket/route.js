@@ -1,21 +1,14 @@
+import promisePool from "@/lib/db";
 import { Server } from "socket.io";
-import { createConnection } from "mysql2/promise";
 
 let io;
-
-const db = createConnection({
-  host: "localhost",
-  user: "root",
-  password: "consep33t",
-  database: "job_platform",
-});
 
 const initializeSocket = (server) => {
   if (!io) {
     io = new Server(server, {
       path: "/api/socket",
       cors: {
-        origin: "*", // Set domain Anda jika diperlukan
+        origin: "*",
         methods: ["GET", "POST"],
       },
     });
@@ -25,10 +18,16 @@ const initializeSocket = (server) => {
 
       socket.on("send_message", async (data) => {
         const { sender_id, receiver_id, pesan } = data;
-        const query = `INSERT INTO chat (sender_id, receiver_id, pesan) VALUES (?, ?, ?)`;
-        await db.execute(query, [sender_id, receiver_id, pesan]);
 
-        io.emit(`receive_message_${receiver_id}`, data);
+        try {
+          const query = `INSERT INTO chat (sender_id, receiver_id, pesan, sent_at, status_dibaca) VALUES (?, ?, ?, NOW(), 0)`;
+          await promisePool.query(query, [sender_id, receiver_id, pesan]);
+
+          // Emit ke penerima
+          io.emit(`receive_message_${receiver_id}`, data);
+        } catch (err) {
+          console.error("Error sending message:", err.message);
+        }
       });
 
       socket.on("disconnect", () => {

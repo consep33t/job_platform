@@ -1,8 +1,17 @@
 import Image from "next/image";
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 
 const JobList = ({ jobs }) => {
   const [detailJob, setDetailJob] = useState([]);
+  const [test, setTest] = useState([]);
+  const router = useRouter();
+
+  const handleChat = (creatorId) => {
+    // Pastikan creatorId diteruskan dengan benar ke URL
+    router.push(`/chat/${creatorId}`);
+    setTest(creatorId);
+  };
 
   const handleApply = async (jobId, creatorId) => {
     try {
@@ -64,6 +73,9 @@ const JobList = ({ jobs }) => {
               <h2 className="card-title">{job.nama_pekerjaan}</h2>
               <p>{job.keterangan}</p>
               <div className="card-actions justify-end">
+                <button onClick={() => handleChat(job.creator_id)}>
+                  Chat{job.creator_id}
+                </button>
                 <button
                   className="btn -bg-tertiary -text-primary -border-tertiary hover:-bg-background hover:-text-tertiary hover:-border-background"
                   onClick={() => handleApply(job.job_id, job.creator_id)}
