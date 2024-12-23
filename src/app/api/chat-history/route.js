@@ -13,8 +13,9 @@ export async function GET(request) {
   const senderId = searchParams.get("sender_id");
   const receiverId = searchParams.get("receiver_id");
 
-  if (!senderId || !receiverId) {
-    return new Response("Sender and receiver are required", { status: 400 });
+  // Validasi input
+  if (!senderId || !receiverId || isNaN(senderId) || isNaN(receiverId)) {
+    return new Response("Invalid sender or receiver ID", { status: 400 });
   }
 
   try {

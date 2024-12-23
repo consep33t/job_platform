@@ -115,9 +115,9 @@ const ProfilePage = () => {
       {/* Header Section */}
       <div>
         <Image
-          width={400}
+          src={users.background_profile || "/profile1.jpg"}
           height={400}
-          src={users.background_profile}
+          width={400}
           className="w-full h-[50vh] rounded-xl object-cover"
           alt="Profile Cover"
         />
@@ -130,9 +130,9 @@ const ProfilePage = () => {
           <div className="avatar">
             <div className="w-36 rounded-full">
               <Image
+                src={users.url_profile || "/profile1.jpg"}
                 width={400}
                 height={400}
-                src={users.url_profile || "https://placeimg.com/192/192/people"}
                 alt="Avatar"
               />
             </div>

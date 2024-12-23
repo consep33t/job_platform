@@ -1,7 +1,7 @@
-import promisePool from "@/lib/db";
 import { Server } from "socket.io";
+import promisePool from "../../../../lib/db";
 
-let io;
+let io; // Simpan instance Socket.IO
 
 const initializeSocket = (server) => {
   if (!io) {
@@ -16,15 +16,30 @@ const initializeSocket = (server) => {
     io.on("connection", (socket) => {
       console.log("User connected:", socket.id);
 
+      // User join ke room berdasarkan userId
+      socket.on("join_room", (userId) => {
+        if (userId) {
+          socket.join(`user_${userId}`);
+          console.log(`User ${userId} joined room user_${userId}`);
+        }
+      });
+
+      // Mengirim pesan
       socket.on("send_message", async (data) => {
         const { sender_id, receiver_id, pesan } = data;
 
         try {
-          const query = `INSERT INTO chat (sender_id, receiver_id, pesan, sent_at, status_dibaca) VALUES (?, ?, ?, NOW(), 0)`;
+          const query = `
+            INSERT INTO chat (sender_id, receiver_id, pesan, sent_at, status_dibaca) 
+            VALUES (?, ?, ?, NOW(), 0)
+          `;
           await promisePool.query(query, [sender_id, receiver_id, pesan]);
 
-          // Emit ke penerima
-          io.emit(`receive_message_${receiver_id}`, data);
+          // Kirim pesan ke penerima melalui room
+          io.to(`user_${receiver_id}`).emit("receive_message", data);
+
+          // Konfirmasi pengirim
+          socket.emit("message_sent", data);
         } catch (err) {
           console.error("Error sending message:", err.message);
         }
@@ -35,10 +50,10 @@ const initializeSocket = (server) => {
       });
     });
   }
-
   return io;
 };
 
+// Inisialisasi hanya sekali
 export async function GET(req, res) {
   if (!res.socket.server.io) {
     console.log("Initializing Socket.IO...");

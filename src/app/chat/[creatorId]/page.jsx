@@ -5,7 +5,7 @@ import io from "socket.io-client";
 import { usePathname } from "next/navigation";
 import { jwtDecode } from "jwt-decode";
 
-// Inisialisasi koneksi socket dengan variabel lingkungan
+// Inisialisasi koneksi socket
 const socket = io(
   process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3000",
   {
@@ -17,21 +17,21 @@ export default function ChatPage() {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [receiverId, setReceiverId] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [creatorId, setCreatorId] = useState(null);
   const [userId, setUserId] = useState(null);
   const [contacts, setContacts] = useState([]);
-
-  const pathname = usePathname();
   const messagesEndRef = useRef(null);
 
+  const pathname = usePathname();
+
+  // Ambil userId dari URL path
   useEffect(() => {
     const creatorIdFromPath = pathname.split("/")[2];
     if (creatorIdFromPath) {
-      setCreatorId(creatorIdFromPath);
+      setReceiverId(creatorIdFromPath);
     }
   }, [pathname]);
 
+  // Decode JWT dan join room
   useEffect(() => {
     if (typeof window !== "undefined") {
       const token = localStorage.getItem("token");
@@ -39,6 +39,7 @@ export default function ChatPage() {
         try {
           const decoded = jwtDecode(token);
           setUserId(decoded.userId);
+          socket.emit("join_room", decoded.userId); // Join room saat login
         } catch (err) {
           console.error("Failed to decode JWT:", err.message);
         }
@@ -46,12 +47,7 @@ export default function ChatPage() {
     }
   }, []);
 
-  useEffect(() => {
-    if (creatorId && userId) {
-      setReceiverId(creatorId);
-    }
-  }, [creatorId, userId]);
-
+  // Fetch chat history
   useEffect(() => {
     const fetchChatHistory = async () => {
       if (!receiverId || !userId) return;
@@ -70,13 +66,12 @@ export default function ChatPage() {
       } catch (err) {
         console.error("Error fetching chat history:", err.message);
       }
-
-      setLoading(false);
     };
 
     fetchChatHistory();
   }, [receiverId, userId]);
 
+  // Fetch kontak
   useEffect(() => {
     const fetchContacts = async () => {
       if (!userId) return;
@@ -97,23 +92,25 @@ export default function ChatPage() {
     fetchContacts();
   }, [userId]);
 
+  // Terima pesan real-time
   useEffect(() => {
-    if (userId) {
-      socket.on(`receive_message_${userId}`, (data) => {
+    socket.on("receive_message", (data) => {
+      if (
+        (data.sender_id === receiverId && data.receiver_id === userId) ||
+        (data.sender_id === userId && data.receiver_id === receiverId)
+      ) {
         setMessages((prev) => [...prev, data]);
-      });
+      }
+    });
 
-      return () => {
-        socket.off(`receive_message_${userId}`);
-      };
-    }
-  }, [userId]);
+    return () => {
+      socket.off("receive_message");
+    };
+  }, [receiverId, userId]);
 
+  // Kirim pesan
   const sendMessage = useCallback(() => {
-    if (!newMessage.trim() || !receiverId) {
-      alert("Pesan tidak boleh kosong!");
-      return;
-    }
+    if (!newMessage.trim() || !receiverId) return;
 
     const messageData = {
       sender_id: userId,
@@ -126,6 +123,7 @@ export default function ChatPage() {
     setNewMessage("");
   }, [newMessage, receiverId, userId]);
 
+  // Scroll otomatis ke bawah
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
@@ -136,7 +134,6 @@ export default function ChatPage() {
     <div className="p-4 w-full h-full">
       <h1 className="text-2xl mb-4">Real-Time Chat</h1>
 
-      {/* Display contacts */}
       <div className="mb-4">
         <h2 className="text-xl mb-2">Contacts</h2>
         <div className="space-y-2">
@@ -144,7 +141,9 @@ export default function ChatPage() {
             contacts.map((contact) => (
               <div
                 key={contact.contact_id}
-                className="p-2 border rounded cursor-pointer hover:bg-gray-200"
+                className={`p-2 border rounded cursor-pointer hover:bg-gray-200 ${
+                  contact.contact_id === receiverId ? "bg-blue-100" : ""
+                }`}
                 onClick={() => setReceiverId(contact.contact_id)}
               >
                 Contact ID: {contact.contact_id}
@@ -156,22 +155,24 @@ export default function ChatPage() {
         </div>
       </div>
 
-      {/* Chat Messages */}
-      <div className="border p-4 h-64 overflow-y-scroll">
-        {messages.map((msg, idx) => (
-          <div
-            key={idx}
-            className={`mb-2 p-2 ${
-              msg.sender_id === userId ? "text-right" : "text-left"
-            }`}
-          >
-            <p className="text-sm">{msg.pesan}</p>
-          </div>
-        ))}
-        <div ref={messagesEndRef} />
-      </div>
+      {receiverId === null ? (
+        <p>Select a contact to start chatting</p>
+      ) : (
+        <div className="border p-4 h-64 overflow-y-scroll">
+          {messages.map((msg, idx) => (
+            <div
+              key={idx}
+              className={`mb-2 p-2 ${
+                msg.sender_id === userId ? "text-right" : "text-left"
+              }`}
+            >
+              <p className="text-sm">{msg.pesan}</p>
+            </div>
+          ))}
+          <div ref={messagesEndRef} />
+        </div>
+      )}
 
-      {/* Message Input */}
       <div className="mt-4">
         <input
           type="text"
