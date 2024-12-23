@@ -2,16 +2,42 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { jwtDecode } from "jwt-decode";
-import Image from "next/image";
-import ChatPage from "../chat/[creatorId]/page";
+import { useRouter } from "next/navigation";
 
 const NavBar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [userId, setUserId] = useState(null);
+  const [contacts, setContacts] = useState([]);
 
-  const toggleMenu = () => {
-    setIsOpen(!isOpen);
+  const router = useRouter();
+
+  // Ambil kontak
+  useEffect(() => {
+    const fetchContacts = async () => {
+      if (!userId) return;
+
+      try {
+        const response = await fetch(`/api/contacts?user_id=${userId}`);
+        if (response.ok) {
+          const data = await response.json();
+          setContacts(data);
+        } else {
+          console.error("Failed to fetch contacts");
+        }
+      } catch (err) {
+        console.error("Error fetching contacts:", err.message);
+      }
+    };
+
+    fetchContacts();
+  }, [userId]);
+
+  const openChat = (creatorId) => {
+    router.push(`/chat/${creatorId}`);
+    const modal = document.getElementById("my_modal_3");
+    if (modal) modal.close();
   };
 
   const openModal = () => {
@@ -32,6 +58,7 @@ const NavBar = () => {
       return;
     } else if (token) {
       const decodedUser = jwtDecode(token);
+      setUserId(decodedUser.userId);
       setUser(decodedUser);
       setIsLoading(false);
     } else {
@@ -105,8 +132,11 @@ const NavBar = () => {
           </div>
         </button>
         {/* Modal */}
-        <dialog id="my_modal_3" className="modal w-full">
-          <div className="modal-box max-w-5xl modal-bottom">
+        <dialog
+          id="my_modal_3"
+          className="modal w-full flex justify-end items-end p-5"
+        >
+          <div className="modal-box max-w-md">
             <button
               className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
               onClick={closeModal}
@@ -115,7 +145,13 @@ const NavBar = () => {
             </button>
             <div className="w-full">
               <div className="w-full">
-                <ChatPage />
+                {contacts.map((contact) => (
+                  <div key={contact.contact_id}>
+                    <button onClick={() => openChat(contact.contact_id)}>
+                      {contact.contact_id}
+                    </button>
+                  </div>
+                ))}
               </div>
             </div>
           </div>

@@ -4,13 +4,11 @@ import { useRouter } from "next/navigation";
 
 const JobList = ({ jobs }) => {
   const [detailJob, setDetailJob] = useState([]);
-  const [test, setTest] = useState([]);
   const router = useRouter();
 
   const handleChat = (creatorId) => {
     // Pastikan creatorId diteruskan dengan benar ke URL
     router.push(`/chat/${creatorId}`);
-    setTest(creatorId);
   };
 
   const handleApply = async (jobId, creatorId) => {

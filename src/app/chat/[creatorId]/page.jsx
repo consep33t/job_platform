@@ -23,7 +23,7 @@ export default function ChatPage() {
 
   const pathname = usePathname();
 
-  // Ambil userId dari URL path
+  // Ambil receiverId dari URL path
   useEffect(() => {
     const creatorIdFromPath = pathname.split("/")[2];
     if (creatorIdFromPath) {
@@ -31,7 +31,7 @@ export default function ChatPage() {
     }
   }, [pathname]);
 
-  // Decode JWT dan join room
+  // Decode JWT dan bergabung ke room Socket.IO
   useEffect(() => {
     if (typeof window !== "undefined") {
       const token = localStorage.getItem("token");
@@ -39,7 +39,7 @@ export default function ChatPage() {
         try {
           const decoded = jwtDecode(token);
           setUserId(decoded.userId);
-          socket.emit("join_room", decoded.userId); // Join room saat login
+          socket.emit("join_room", decoded.userId);
         } catch (err) {
           console.error("Failed to decode JWT:", err.message);
         }
@@ -47,7 +47,7 @@ export default function ChatPage() {
     }
   }, []);
 
-  // Fetch chat history
+  // Ambil riwayat chat
   useEffect(() => {
     const fetchChatHistory = async () => {
       if (!receiverId || !userId) return;
@@ -71,7 +71,7 @@ export default function ChatPage() {
     fetchChatHistory();
   }, [receiverId, userId]);
 
-  // Fetch kontak
+  // Ambil kontak
   useEffect(() => {
     const fetchContacts = async () => {
       if (!userId) return;
@@ -92,7 +92,7 @@ export default function ChatPage() {
     fetchContacts();
   }, [userId]);
 
-  // Terima pesan real-time
+  // Terima pesan secara real-time
   useEffect(() => {
     socket.on("receive_message", (data) => {
       if (
@@ -123,7 +123,7 @@ export default function ChatPage() {
     setNewMessage("");
   }, [newMessage, receiverId, userId]);
 
-  // Scroll otomatis ke bawah
+  // Scroll otomatis ke bawah saat ada pesan baru
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
@@ -131,62 +131,85 @@ export default function ChatPage() {
   }, [messages]);
 
   return (
-    <div className="p-4 w-full h-full">
-      <h1 className="text-2xl mb-4">Real-Time Chat</h1>
+    <div className="w-full h-[75vh] mb-20 -bg-secondary rounded-md p-5 flex flex-col">
+      <div className="w-full h-full flex gap-5">
+        {/* Sidebar */}
+        <div className="h-full w-1/4 flex flex-col">
+          <h1 className="text-2xl py-5">Pesan Chat Lastron</h1>
+          <input
+            type="text"
+            placeholder="Search contacts..."
+            className="outline-none border-none focus:outline-none p-2 rounded w-full mb-5 -bg-primary bg-opacity-15 text-white"
+          />
+          <div className="space-y-2 overflow-auto">
+            {contacts.length > 0 ? (
+              contacts.map((contact) => (
+                <div
+                  key={contact.contact_id}
+                  className={`p-2 rounded cursor-pointer 
+          ${
+            contact.contact_id === receiverId ? "-bg-primary bg-opacity-15" : ""
+          } 
+          hover:-bg-primary hover:bg-opacity-15`}
+                  onClick={() => setReceiverId(contact.contact_id)}
+                >
+                  Contact ID: {contact.contact_id}
+                </div>
+              ))
+            ) : (
+              <p>No contacts available.</p>
+            )}
+          </div>
+        </div>
 
-      <div className="mb-4">
-        <h2 className="text-xl mb-2">Contacts</h2>
-        <div className="space-y-2">
-          {contacts.length > 0 ? (
-            contacts.map((contact) => (
-              <div
-                key={contact.contact_id}
-                className={`p-2 border rounded cursor-pointer hover:bg-gray-200 ${
-                  contact.contact_id === receiverId ? "bg-blue-100" : ""
-                }`}
-                onClick={() => setReceiverId(contact.contact_id)}
-              >
-                Contact ID: {contact.contact_id}
-              </div>
-            ))
+        {/* Chat Window */}
+        <div className="w-full h-full flex flex-col">
+          <div className="p-5 w-full">anjayy</div>
+          {receiverId === null ? (
+            <p>Select a contact to start chatting</p>
           ) : (
-            <p>No contacts available.</p>
-          )}
-        </div>
-      </div>
-
-      {receiverId === null ? (
-        <p>Select a contact to start chatting</p>
-      ) : (
-        <div className="border p-4 h-64 overflow-y-scroll">
-          {messages.map((msg, idx) => (
-            <div
-              key={idx}
-              className={`mb-2 p-2 ${
-                msg.sender_id === userId ? "text-right" : "text-left"
-              }`}
-            >
-              <p className="text-sm">{msg.pesan}</p>
+            <div className="flex-grow bg-[url(/bgChat2.jpg)] bg-cover bg-center p-4 overflow-y-auto w-full">
+              {messages.map((msg, idx) => (
+                <div
+                  key={idx}
+                  className={`chat ${
+                    msg.sender_id === userId ? "chat-end" : "chat-start"
+                  }`}
+                >
+                  <div
+                    className={`chat-bubble text-white ${
+                      msg.sender_id === userId
+                        ? "-bg-tertiary"
+                        : "-bg-secondary"
+                    }`}
+                  >
+                    {msg.pesan}
+                  </div>
+                </div>
+              ))}
+              <div ref={messagesEndRef} />
             </div>
-          ))}
-          <div ref={messagesEndRef} />
-        </div>
-      )}
+          )}
 
-      <div className="mt-4">
-        <input
-          type="text"
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          className="border p-2 rounded w-full mb-2"
-          placeholder="Type your message..."
-        />
-        <button
-          onClick={sendMessage}
-          className="bg-blue-500 text-white p-2 rounded w-full"
-        >
-          Send
-        </button>
+          {/* Input Message */}
+          <div className="mt-4 flex gap-5 items-center">
+            <input
+              type="text"
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              className="p-2 rounded w-full outline-none border-none focus:outline-none"
+              placeholder="Type your message..."
+              autoFocus
+            />
+
+            <button
+              onClick={sendMessage}
+              className="-bg-tertiary text-white px-2 py-2 rounded w-1/4"
+            >
+              Send
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );

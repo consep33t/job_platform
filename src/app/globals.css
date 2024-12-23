@@ -2,8 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
-html,
-body {
-  background-color: #fcfcfc;
-  scroll-behavior: smooth;
+@layer base {
+  html,
+  body {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    background-color: #fcfcfc;
+    scroll-behavior: smooth;
+  }
+
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    display: none;
+  }
 }
