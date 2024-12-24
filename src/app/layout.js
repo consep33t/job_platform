@@ -12,7 +12,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className={`antialiased`}>
         <NavBar />
-        <div className="px-24">{children}</div>
+        <div className="px-16">{children}</div>
         <Footer />
       </body>
     </html>

@@ -131,30 +131,39 @@ export default function ChatPage() {
   }, [messages]);
 
   return (
-    <div className="w-full h-[75vh] mb-20 -bg-secondary rounded-md p-5 flex flex-col">
-      <div className="w-full h-full flex gap-5">
+    <div className="w-full h-[75vh] mb-20 -bg-secondary rounded-md flex flex-col">
+      <div className="w-full h-full flex">
         {/* Sidebar */}
-        <div className="h-full w-1/4 flex flex-col">
-          <h1 className="text-2xl py-5">Pesan Chat Lastron</h1>
+        <div className="h-full w-1/4 flex flex-col p-5 border-r border-black">
+          <h1 className="text-2xl pb-5">Pesan Chat Lastron</h1>
           <input
             type="text"
             placeholder="Search contacts..."
             className="outline-none border-none focus:outline-none p-2 rounded w-full mb-5 -bg-primary bg-opacity-15 text-white"
           />
-          <div className="space-y-2 overflow-auto">
+          <div className="space-y-2 overflow-y-auto">
             {contacts.length > 0 ? (
               contacts.map((contact) => (
-                <div
-                  key={contact.contact_id}
-                  className={`p-2 rounded cursor-pointer 
-          ${
-            contact.contact_id === receiverId ? "-bg-primary bg-opacity-15" : ""
-          } 
-          hover:-bg-primary hover:bg-opacity-15`}
-                  onClick={() => setReceiverId(contact.contact_id)}
-                >
-                  Contact ID: {contact.contact_id}
-                </div>
+                <>
+                  <div
+                    key={contact.contact_id}
+                    className={`p-3 rounded cursor-pointer flex items-center gap-5
+                    ${
+                      contact.contact_id === receiverId
+                        ? "-bg-primary bg-opacity-15"
+                        : ""
+                    } 
+                      hover:-bg-primary hover:bg-opacity-15`}
+                    onClick={() => setReceiverId(contact.contact_id)}
+                  >
+                    <div className="avatar">
+                      <div className="w-16 rounded-full">
+                        <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
+                      </div>
+                    </div>
+                    Contact ID: {contact.contact_id}
+                  </div>
+                </>
               ))
             ) : (
               <p>No contacts available.</p>
@@ -163,8 +172,15 @@ export default function ChatPage() {
         </div>
 
         {/* Chat Window */}
-        <div className="w-full h-full flex flex-col">
-          <div className="p-5 w-full">anjayy</div>
+        <div className="w-full h-full flex flex-col pt-3 pr-5">
+          <div className="pb-3 px-5 w-full flex items-center gap-5">
+            <div className="avatar">
+              <div className="w-12 rounded-full">
+                <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
+              </div>
+            </div>
+            anjayy
+          </div>
           {receiverId === null ? (
             <p>Select a contact to start chatting</p>
           ) : (
@@ -192,12 +208,12 @@ export default function ChatPage() {
           )}
 
           {/* Input Message */}
-          <div className="mt-4 flex gap-5 items-center">
+          <div className="py-1 pl-5 flex gap-5 items-center">
             <input
               type="text"
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
-              className="p-2 rounded w-full outline-none border-none focus:outline-none"
+              className="p-2 rounded w-full outline-none border-none focus:outline-none -bg-secondary"
               placeholder="Type your message..."
               autoFocus
             />
