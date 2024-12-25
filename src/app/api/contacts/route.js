@@ -4,18 +4,32 @@ export async function GET(req) {
   const { searchParams } = new URL(req.url);
   const userId = searchParams.get("user_id");
 
+  if (!userId) {
+    return new Response(JSON.stringify({ error: "user_id is required" }), {
+      status: 400,
+    });
+  }
+
   try {
     const [rows] = await promisePool.query(
       `
       SELECT DISTINCT
         CASE
-          WHEN sender_id = ? THEN receiver_id
-          ELSE sender_id
-        END AS contact_id
-      FROM chat
-      WHERE sender_id = ? OR receiver_id = ?
+          WHEN c.sender_id = ? THEN c.receiver_id
+          ELSE c.sender_id
+        END AS contact_id,
+        u.nama,
+        u.email,
+        u.url_profile
+      FROM chat c
+      JOIN user u
+        ON u.user_id = CASE
+                        WHEN c.sender_id = ? THEN c.receiver_id
+                        ELSE c.sender_id
+                      END
+      WHERE c.sender_id = ? OR c.receiver_id = ?
       `,
-      [userId, userId, userId]
+      [userId, userId, userId, userId]
     );
 
     return new Response(JSON.stringify(rows), { status: 200 });

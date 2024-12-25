@@ -6,7 +6,7 @@
     "start-watcher": "node chokidar-watcher.js",
     "dev": "node server.js",
     "build": "next build",
-    "start": "next start",
+    "start": "node server.js",
     "lint": "eslint ."
   },
   "dependencies": {

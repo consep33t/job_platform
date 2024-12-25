@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import io from "socket.io-client";
 import { usePathname } from "next/navigation";
 import { jwtDecode } from "jwt-decode";
+import Image from "next/image";
 
 // Inisialisasi koneksi socket
 const socket = io(
@@ -19,6 +20,7 @@ export default function ChatPage() {
   const [receiverId, setReceiverId] = useState(null);
   const [userId, setUserId] = useState(null);
   const [contacts, setContacts] = useState([]);
+  const [filteredContacts, setFilteredContacts] = useState([]);
   const messagesEndRef = useRef(null);
 
   const pathname = usePathname();
@@ -81,6 +83,7 @@ export default function ChatPage() {
         if (response.ok) {
           const data = await response.json();
           setContacts(data);
+          setFilteredContacts(data);
         } else {
           console.error("Failed to fetch contacts");
         }
@@ -123,12 +126,24 @@ export default function ChatPage() {
     setNewMessage("");
   }, [newMessage, receiverId, userId]);
 
-  // Scroll otomatis ke bawah saat ada pesan baru
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages]);
+
+  // Fungsi pencarian kontak
+  const handleSearchContact = (e) => {
+    const searchQuery = e.target.value.toLowerCase();
+    if (searchQuery.trim() === "") {
+      setFilteredContacts(contacts);
+    } else {
+      const filtered = contacts.filter((contact) =>
+        contact.nama.toLowerCase().includes(searchQuery)
+      );
+      setFilteredContacts(filtered);
+    }
+  };
 
   return (
     <div className="w-full h-[75vh] mb-20 -bg-secondary rounded-md flex flex-col">
@@ -140,30 +155,37 @@ export default function ChatPage() {
             type="text"
             placeholder="Search contacts..."
             className="outline-none border-none focus:outline-none p-2 rounded w-full mb-5 -bg-primary bg-opacity-15 text-white"
+            onChange={handleSearchContact}
           />
           <div className="space-y-2 overflow-y-auto">
-            {contacts.length > 0 ? (
-              contacts.map((contact) => (
-                <>
-                  <div
-                    key={contact.contact_id}
-                    className={`p-3 rounded cursor-pointer flex items-center gap-5
+            {filteredContacts.length > 0 ? (
+              filteredContacts.map((contact) => (
+                <div
+                  key={contact.contact_id}
+                  className={`p-3 rounded cursor-pointer flex items-center gap-5
                     ${
                       contact.contact_id === receiverId
                         ? "-bg-primary bg-opacity-15"
                         : ""
                     } 
                       hover:-bg-primary hover:bg-opacity-15`}
-                    onClick={() => setReceiverId(contact.contact_id)}
-                  >
-                    <div className="avatar">
-                      <div className="w-16 rounded-full">
-                        <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
-                      </div>
+                  onClick={() => setReceiverId(contact.contact_id)}
+                >
+                  <div className="avatar">
+                    <div className="w-16 rounded-full">
+                      <Image
+                        src={
+                          contact.url_profile ||
+                          "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
+                        }
+                        width={100}
+                        height={100}
+                        alt="avatar"
+                      />
                     </div>
-                    Contact ID: {contact.contact_id}
                   </div>
-                </>
+                  {contact.nama}
+                </div>
               ))
             ) : (
               <p>No contacts available.</p>
@@ -173,14 +195,25 @@ export default function ChatPage() {
 
         {/* Chat Window */}
         <div className="w-full h-full flex flex-col pt-3 pr-5">
-          <div className="pb-3 px-5 w-full flex items-center gap-5">
-            <div className="avatar">
-              <div className="w-12 rounded-full">
-                <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
+          {filteredContacts.length > 0 && (
+            <div className="pb-3 px-5 w-full flex items-center gap-5">
+              <div className="avatar">
+                <div className="w-12 rounded-full">
+                  <Image
+                    src={
+                      filteredContacts.find((c) => c.contact_id === receiverId)
+                        ?.url_profile ||
+                      "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
+                    }
+                    width={100}
+                    height={100}
+                    alt="avatar"
+                  />
+                </div>
               </div>
+              {filteredContacts.find((c) => c.contact_id === receiverId)?.nama}
             </div>
-            anjayy
-          </div>
+          )}
           {receiverId === null ? (
             <p>Select a contact to start chatting</p>
           ) : (
