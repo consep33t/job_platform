@@ -3,16 +3,14 @@
 import { useState } from "react";
 import { jwtDecode } from "jwt-decode";
 
-const Settings = () => {
+const Settings = ({ user }) => {
   const [formData, setFormData] = useState({
-    nama: "",
-    semboyan: "",
-    pekerjaan: "",
-    phone: "",
-    skils: "",
+    nama: user.nama || "",
+    semboyan: user.semboyan || "",
+    pekerjaan: user.pekerjaan || "",
+    phone: user.phone || "",
+    skils: Array.isArray(user.skils) ? user.skils.join(",") : user.skils || "",
   });
-  const [profileImage, setProfileImage] = useState(null);
-  const [backgroundImage, setBackgroundImage] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState("");
 
@@ -22,14 +20,6 @@ const Settings = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleFileChange = (e, type) => {
-    if (type === "profile") {
-      setProfileImage(e.target.files[0]);
-    } else if (type === "background") {
-      setBackgroundImage(e.target.files[0]);
-    }
   };
 
   const handleSubmit = async (e) => {
@@ -46,9 +36,6 @@ const Settings = () => {
       data.append("skils", JSON.stringify(formData.skils.split(",")));
       data.append("user_id", decode.userId);
 
-      if (profileImage) data.append("url_profile", profileImage);
-      if (backgroundImage) data.append("background_profile", backgroundImage);
-
       const response = await fetch("/api/users/update", {
         method: "POST",
         body: data,
@@ -56,8 +43,6 @@ const Settings = () => {
 
       if (response.ok) {
         setMessage("Profil berhasil diperbarui!");
-        setProfileImage(null);
-        setBackgroundImage(null);
         setFormData((prev) => ({ ...prev, skils: "" }));
         window.location.reload();
       } else {
@@ -82,7 +67,6 @@ const Settings = () => {
         value={formData.nama}
         onChange={handleChange}
         placeholder="Nama"
-        required
         className="input input-bordered w-full -bg-background"
       />
       <input
@@ -106,7 +90,7 @@ const Settings = () => {
         name="phone"
         value={formData.phone}
         onChange={handleChange}
-        placeholder="Nomor Telepon"
+        placeholder="Phone"
         className="input input-bordered w-full -bg-background"
       />
       <input
@@ -114,18 +98,8 @@ const Settings = () => {
         name="skils"
         value={formData.skils}
         onChange={handleChange}
-        placeholder="Skils (pisahkan dengan koma, contoh: React,Node.js,MySQL)"
+        placeholder="Skils"
         className="input input-bordered w-full -bg-background"
-      />
-      <input
-        type="file"
-        onChange={(e) => handleFileChange(e, "profile")}
-        className="file-input w-full -bg-background"
-      />
-      <input
-        type="file"
-        onChange={(e) => handleFileChange(e, "background")}
-        className="file-input w-full -bg-background"
       />
       <button
         type="submit"

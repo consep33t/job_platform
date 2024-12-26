@@ -17,6 +17,8 @@ const ProfilePage = () => {
   const [error, setError] = useState("");
   const [jobPerjanjian, setJobPerjanjian] = useState([]);
   const [selectedJobId, setSelectedJobId] = useState(null);
+  const [profileImage, setProfileImage] = useState(null);
+  const [backgroundImage, setBackgroundImage] = useState(null);
 
   const handleDetailClick = (jobId) => {
     setSelectedJobId(selectedJobId === jobId ? null : jobId);
@@ -100,6 +102,51 @@ const ProfilePage = () => {
     return await response.json();
   };
 
+  const handleFileChange = async (e, type) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("User not authenticated");
+      return;
+    }
+
+    const decodedUser = jwtDecode(token);
+    const userId = decodedUser.userId;
+
+    const formData = new FormData();
+    formData.append("user_id", userId);
+    if (type === "update-url-profile") {
+      formData.append("url_profile", file);
+    } else {
+      formData.append("background_profile", file);
+    }
+
+    try {
+      const response = await fetch(`/api/users/${type}`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to upload image");
+      }
+
+      const data = await response.json();
+      if (type === "update-url-profile") setProfileImage(data.url);
+      if (type === "update-background-profile") setBackgroundImage(data.url);
+
+      alert("Image uploaded successfully!");
+    } catch (error) {
+      console.error("Error uploading file:", error);
+      alert("Failed to upload image");
+    }
+  };
+
   const handleButtonClick = (type) => setButtonType(type);
 
   if (loading)
@@ -113,29 +160,51 @@ const ProfilePage = () => {
   return (
     <div className="w-full">
       {/* Header Section */}
-      <div>
+      <div className="relative">
         <Image
-          src={users.background_profile || "/profile1.jpg"}
+          src={backgroundImage || users.background_profile || "/profile1.jpg"}
           height={400}
           width={400}
           className="w-full h-[50vh] rounded-xl object-cover"
           alt="Profile Cover"
         />
+        <div className="absolute top-5 right-5">
+          <label className="btn btn-ghost">
+            Change Background
+            <input
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => handleFileChange(e, "update-background-profile")}
+            />
+          </label>
+        </div>
       </div>
 
       {/* Content Section */}
       <div className="w-full mt-10 flex gap-10 my-10">
         {/* Profile Info */}
         <div className="w-1/3 -bg-background rounded-xl flex flex-col items-center p-10 gap-5">
-          <div className="avatar">
-            <div className="w-36 rounded-full">
-              <Image
-                src={users.url_profile || "/profile1.jpg"}
-                width={400}
-                height={400}
-                alt="Avatar"
-              />
+          <div className="relative">
+            <div className="avatar">
+              <div className="w-36 rounded-full">
+                <Image
+                  src={profileImage || users.url_profile || "/profile1.jpg"}
+                  width={400}
+                  height={400}
+                  alt="Avatar"
+                />
+              </div>
             </div>
+            <label className="btn btn-ghost absolute">
+              Edit
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => handleFileChange(e, "update-url-profile")}
+              />
+            </label>
           </div>
           <div>
             <h1 className="text-3xl font-bold -text-quaternary">

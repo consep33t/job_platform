@@ -134,9 +134,9 @@ const NavBar = () => {
         {/* Modal */}
         <dialog
           id="my_modal_3"
-          className="modal w-full flex justify-end items-end p-5"
+          className="modal w-full flex justify-end items-start p-5"
         >
-          <div className="modal-box max-w-md">
+          <div className="modal-box -bg-primary -text-secondary max-w-md">
             <button
               className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
               onClick={closeModal}
@@ -145,13 +145,29 @@ const NavBar = () => {
             </button>
             <div className="w-full">
               <div className="w-full">
-                {contacts.map((contact) => (
-                  <div key={contact.contact_id}>
-                    <button onClick={() => openChat(contact.contact_id)}>
-                      {contact.contact_id}
+                {contacts.length > 0 ? (
+                  contacts.map((contact) => (
+                    <div key={contact.contact_id}>
+                      <button
+                        onClick={() => openChat(contact.contact_id)}
+                        className="hover:-bg-secondary hover:bg-opacity-15 w-full py-2 flex justify-center items-center capitalize rounded-md"
+                      >
+                        {contact.nama || "Login Untuk Melihat Kontak Chat"}
+                      </button>
+                    </div>
+                  ))
+                ) : (
+                  <div>
+                    <button
+                      onClick={() => {
+                        closeModal();
+                        router.push("/login");
+                      }}
+                    >
+                      Login Untuk Melihat Kontak Chat
                     </button>
                   </div>
-                ))}
+                )}
               </div>
             </div>
           </div>
