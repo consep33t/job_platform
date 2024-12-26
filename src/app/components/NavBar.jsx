@@ -2,15 +2,42 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { jwtDecode } from "jwt-decode";
-import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 const NavBar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [userId, setUserId] = useState(null);
+  const [contacts, setContacts] = useState([]);
 
-  const toggleMenu = () => {
-    setIsOpen(!isOpen);
+  const router = useRouter();
+
+  // Ambil kontak
+  useEffect(() => {
+    const fetchContacts = async () => {
+      if (!userId) return;
+
+      try {
+        const response = await fetch(`/api/contacts?user_id=${userId}`);
+        if (response.ok) {
+          const data = await response.json();
+          setContacts(data);
+        } else {
+          console.error("Failed to fetch contacts");
+        }
+      } catch (err) {
+        console.error("Error fetching contacts:", err.message);
+      }
+    };
+
+    fetchContacts();
+  }, [userId]);
+
+  const openChat = (creatorId) => {
+    router.push(`/chat/${creatorId}`);
+    const modal = document.getElementById("my_modal_3");
+    if (modal) modal.close();
   };
 
   const openModal = () => {
@@ -31,6 +58,7 @@ const NavBar = () => {
       return;
     } else if (token) {
       const decodedUser = jwtDecode(token);
+      setUserId(decodedUser.userId);
       setUser(decodedUser);
       setIsLoading(false);
     } else {
@@ -104,27 +132,43 @@ const NavBar = () => {
           </div>
         </button>
         {/* Modal */}
-        <dialog id="my_modal_3" className="modal w-full">
-          <div className="modal-box">
+        <dialog
+          id="my_modal_3"
+          className="modal w-full flex justify-end items-start p-5"
+        >
+          <div className="modal-box -bg-primary -text-secondary max-w-md">
             <button
               className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
               onClick={closeModal}
             >
               ✕
             </button>
-            <div className="w-16">
-              <button className="">
-                <div className="avatar">
-                  <div className="w-full rounded-full">
-                    <Image
-                      width={100}
-                      height={100}
-                      src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
-                      alt="avatar"
-                    />
+            <div className="w-full">
+              <div className="w-full">
+                {contacts.length > 0 ? (
+                  contacts.map((contact) => (
+                    <div key={contact.contact_id}>
+                      <button
+                        onClick={() => openChat(contact.contact_id)}
+                        className="hover:-bg-secondary hover:bg-opacity-15 w-full py-2 flex justify-center items-center capitalize rounded-md"
+                      >
+                        {contact.nama || "Login Untuk Melihat Kontak Chat"}
+                      </button>
+                    </div>
+                  ))
+                ) : (
+                  <div>
+                    <button
+                      onClick={() => {
+                        closeModal();
+                        router.push("/login");
+                      }}
+                    >
+                      Login Untuk Melihat Kontak Chat
+                    </button>
                   </div>
-                </div>
-              </button>
+                )}
+              </div>
             </div>
           </div>
         </dialog>

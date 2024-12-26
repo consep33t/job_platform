@@ -82,7 +82,7 @@ export async function POST(req) {
         keterangan,
         kategori_pekerjaan,
         parseInt(lama_waktu),
-        fileName, // Simpan nama file (bukan URL) ke database
+        fileName,
         creator_id,
       ]
     );

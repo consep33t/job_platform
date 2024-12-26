@@ -1,8 +1,34 @@
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { jwtDecode } from "jwt-decode";
 
 const JobList = ({ jobs }) => {
   const [detailJob, setDetailJob] = useState([]);
+  const router = useRouter();
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    if (token) {
+      try {
+        const decodedUser = jwtDecode(token);
+        setUser(decodedUser.userId);
+        console.log(decodedUser.userId);
+      } catch (error) {
+        console.error("Error decoding token:", error);
+      }
+    }
+  }, []);
+
+  const handleChat = (creatorId) => {
+    if (creatorId === user) {
+      alert("Anda tidak dapat mengirim pesan ke diri sendiri.");
+      return;
+    }
+    router.push(`/chat/${creatorId}`);
+  };
 
   const handleApply = async (jobId, creatorId) => {
     try {
@@ -64,6 +90,12 @@ const JobList = ({ jobs }) => {
               <h2 className="card-title">{job.nama_pekerjaan}</h2>
               <p>{job.keterangan}</p>
               <div className="card-actions justify-end">
+                <button
+                  className="btn -bg-background -text-secondary -border-background hover:-bg-tertiary hover:-text-primary hover:-border-tertiary"
+                  onClick={() => handleChat(job.creator_id)}
+                >
+                  Chat
+                </button>
                 <button
                   className="btn -bg-tertiary -text-primary -border-tertiary hover:-bg-background hover:-text-tertiary hover:-border-background"
                   onClick={() => handleApply(job.job_id, job.creator_id)}
